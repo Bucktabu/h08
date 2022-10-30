@@ -3,8 +3,8 @@ import {UserDBType} from "../types/user-type";
 import {settings} from "../settings";
 
 export const jwsService = {
-    async createJWT(user: UserDBType) {
-        return jwt.sign({userId: user.id}, settings.JWT_SECRET, {expiresIn: '720h'})
+    async createJWT(user: UserDBType, timeToeExpired: number) {
+        return jwt.sign({userId: user.id}, settings.JWT_SECRET, {expiresIn: `${timeToeExpired}s`})
     },
 
     async getUserIdByToken(token: string) {

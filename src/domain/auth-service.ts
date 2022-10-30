@@ -33,7 +33,7 @@ export const authService = {
                 }),
                 isConfirmed: false
             }
-        }
+        } // структура
 
         console.log('confirmationCode:', userAccount.emailConfirmation.confirmationCode)
 

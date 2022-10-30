@@ -54,22 +54,5 @@ export const usersService = {
 
     async deleteUserById(userId: string): Promise<boolean> {
         return await usersRepository.deleteUserById(userId)
-    },
-
-    async checkCredential(login: string, password: string): Promise<UserDBType | null> {
-        const user: UserDBType | null = await usersRepository.giveUserByLoginOrEmail(login)
-
-        if (!user) {
-            return null
-        }
-
-        const passwordEqual = await bcrypt.compare(password, user.passwordHash)
-
-        if (!passwordEqual) {
-            return null
-        }
-
-        return user
     }
-
 }

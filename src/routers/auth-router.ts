@@ -6,6 +6,8 @@ import {getAuthRouterMiddleware,
         postAuthRouterMiddleware,
         postRegistrationMiddleware,
         postResendingRegistrationEmailMiddleware} from "../middlewares/authRouter-middleware";
+import {log} from "util";
+
 
 export const authRouter = Router({})
 
@@ -13,15 +15,10 @@ authRouter.post('/login',
     postAuthRouterMiddleware,
     async (req: Request, res: Response) => {
 
-        const user = await usersService.checkCredential(req.body.login, req.body.password)
+        const accessToken = await jwsService.createJWT(req.user!, 10)
+        const refreshToken = await jwsService.createJWT(req.user!, 20)
 
-        if (!user) {
-            return res.sendStatus(401)
-        }
-
-        const token = await jwsService.createJWT(user)
-
-        return res.status(200).send({accessToken: token})
+        return res.status(200).cookie(req.user!.id, refreshToken).send({accessToken: accessToken}) // должны ли приходить куки если 401 ошибка
     }
 )
 
