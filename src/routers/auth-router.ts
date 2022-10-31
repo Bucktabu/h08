@@ -16,7 +16,7 @@ authRouter.post('/login',
         const accessToken = await jwsService.createJWT(req.user!, 432000) // поменять потом на 10
         const refreshToken = await jwsService.createJWT(req.user!, 432000) // поменять потом на 20
 
-        return res.status(200).cookie(req.user!.id, refreshToken).send({accessToken: accessToken}) // должны ли приходить куки если 401 ошибка
+        return res.status(200).cookie('refreshToken', refreshToken, {secure:true, httpOnly: true}).send({accessToken: accessToken}) // должны ли приходить куки если 401 ошибка
     }
 )
 
@@ -64,7 +64,7 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 authRouter.get('/me',
     getAuthRouterMiddleware,
     async (req: Request, res: Response) => {
-        const aboutMe = usersService.aboutMe(req.user!)
+        const aboutMe = await usersService.aboutMe(req.user!)
         console.log('-----> aboutMe: ', aboutMe)
 
         return res.status(200).send({aboutMe}) // почему в бади не выводит

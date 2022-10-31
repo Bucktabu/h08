@@ -8,15 +8,15 @@ export const checkCredential = async (req: Request, res: Response, next: NextFun
     const user: UserDBType | null = await usersRepository.giveUserByLoginOrEmail(req.body.login)
 
     if (!user) {
-        return res.status(401).send('Invalid login or user with this login does not exist')
+        return res.sendStatus(401)
     }
 
     const passwordEqual = await bcrypt.compare(req.body.password, user!.passwordHash)
 
     if (!passwordEqual) {
-        return res.status(401).send('Wrong password')
+        return res.sendStatus(401)
     }
 
     req.user = user
-    next()
+    return next()
 }

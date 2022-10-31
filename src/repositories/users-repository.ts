@@ -19,7 +19,7 @@ export const usersRepository = {
                     pageSize: string,
                     searchLoginTerm: string,
                     searchEmailTerm: string): Promise<UsersType> {
-
+        // проверить на существование term
         return await usersCollection
             .find({
                 $or: [
