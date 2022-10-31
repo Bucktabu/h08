@@ -6,8 +6,6 @@ import {getAuthRouterMiddleware,
         postAuthRouterMiddleware,
         postRegistrationMiddleware,
         postResendingRegistrationEmailMiddleware} from "../middlewares/authRouter-middleware";
-import {log} from "util";
-
 
 export const authRouter = Router({})
 
@@ -15,8 +13,8 @@ authRouter.post('/login',
     postAuthRouterMiddleware,
     async (req: Request, res: Response) => {
 
-        const accessToken = await jwsService.createJWT(req.user!, 10)
-        const refreshToken = await jwsService.createJWT(req.user!, 20)
+        const accessToken = await jwsService.createJWT(req.user!, 432000) // поменять потом на 10
+        const refreshToken = await jwsService.createJWT(req.user!, 432000) // поменять потом на 20
 
         return res.status(200).cookie(req.user!.id, refreshToken).send({accessToken: accessToken}) // должны ли приходить куки если 401 ошибка
     }
@@ -45,7 +43,7 @@ authRouter.post('/registration-confirmation',
     }
 )
 
-authRouter.post('/registration-email-resending', // попробовать создать другой код и отправить его в письме
+authRouter.post('/registration-email-resending',
     ...postResendingRegistrationEmailMiddleware,
     async (req: Request, res: Response) => {
 
@@ -59,11 +57,16 @@ authRouter.post('/registration-email-resending', // попробовать со�
     }
 )
 
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+    const user = jwsService.getUserIdByToken(req.cookies.refreshToken)
+})
+
 authRouter.get('/me',
     getAuthRouterMiddleware,
     async (req: Request, res: Response) => {
         const aboutMe = usersService.aboutMe(req.user!)
+        console.log('-----> aboutMe: ', aboutMe)
 
-        return res.status(200).send({aboutMe})
+        return res.status(200).send({aboutMe}) // почему в бади не выводит
     }
 )

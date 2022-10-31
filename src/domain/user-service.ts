@@ -9,6 +9,7 @@ import {userDBtoUser, usersOutputType} from "../dataMapping/toUserOutputType";
 
 export const usersService = {
     async aboutMe(user: UserDBType): Promise<AboutMeType> {
+        console.log('-----> user: ', user)
         return userDBtoUser(user)
     },
 
@@ -48,7 +49,8 @@ export const usersService = {
 
         const users = await usersRepository.giveUsers(sortBy, sortDirection, pageNumber, pageSize, searchLoginTerm, searchEmailTerm)
         const totalCount = await usersRepository.giveTotalCount(searchLoginTerm, searchEmailTerm)
-
+        console.log('-----> users', users)
+        console.log('-----> totalCount', totalCount)
         return paginationContentPage(pageNumber, pageSize, users, totalCount)
     },
 

@@ -22,13 +22,11 @@ export const usersRepository = {
 
         return await usersCollection
             .find({
-                $or: [{login: {$regex: searchLoginTerm, $options: 'i'}}, {
-                    email: {
-                        $regex: searchEmailTerm,
-                        $options: 'i'
-                    }
-                }]
-            }, {projection: {_id: false, passwordHash: false, passwordSalt: false}})
+                $or: [
+                    {login: {$regex: searchLoginTerm, $options: 'i'}},
+                    {email: {$regex: searchEmailTerm, $options: 'i'}}]
+                },
+                {projection: {_id: false, passwordHash: false, passwordSalt: false}})
             .sort(sortBy, sortDirection === 'asc' ? 1 : -1)
             .skip(giveSkipNumber(pageNumber, pageSize))
             .limit(Number(pageSize))
@@ -47,9 +45,6 @@ export const usersRepository = {
         return await usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
     },
 
-    async giveUserByLoginAndEmail(login: string, email: string) {
-        return await usersCollection.findOne({$or: [{login: login}, {email: email}]})
-    },
 
     async deleteUserById(userId: string): Promise<boolean> {
         const result = await usersCollection.deleteOne({id: userId})

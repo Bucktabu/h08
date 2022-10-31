@@ -31,7 +31,7 @@ usersRouter.post('/',
 usersRouter.get('/',
     ...getUsersRouterMiddleware,
     async (req: RequestWithQuery<QueryParameters>, res: Response) => {
-
+        console.log('-----> searchLoginTerm: ', req.query.searchLoginTerm)
         const pageWithUsers: ContentPageType = await usersService
             .giveUsersPage(req.query.sortBy,
                            req.query.sortDirection,

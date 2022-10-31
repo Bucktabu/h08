@@ -1,7 +1,5 @@
 import request from 'supertest'
 import {app} from "../../index";
-import {blogsRepository} from "../../repositories/blogs-repository";
-import {readdir} from "fs/promises";
 
 jest.setTimeout(30000)
 
@@ -60,7 +58,7 @@ describe('/posts', () => {
     //
     //     expect(createdBlog).toEqual({
     //         id: expect.any(String),
-    //         name: createdBlogs.name,
+    //         name: createResponse.body.name,
     //         youtubeUrl: expect.stringMatching(/^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/),
     //         createdAt: expect.stringMatching(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/)
     //     })
@@ -192,9 +190,9 @@ describe('/posts', () => {
     //
     //     expect(post.body).toEqual(createdPost)
     // })
-
-    // Method GET (GET by id method is checked in POST)
-
+    //
+    // // Method GET (GET by id method is checked in POST)
+    //
     // it('Method GET /blogs without input query parameters. ' +
     //          'Expected 200 - return page with blogs ', async () => {
     //     const createBlog1 = await request(app)
@@ -445,7 +443,7 @@ describe('/posts', () => {
     // })
     //
     // it('Method GET /blogs/blogId/posts with pageSize=2&sortBy=title&sortDirection=asc' +
-    //     'Expect 200 - return page with 2 posts', async () => {
+    //    'Expect 200 - return page with 2 posts', async () => {
     //     const createNewBlog = await request(app)
     //         .post('/blogs')
     //         .send({
@@ -462,7 +460,7 @@ describe('/posts', () => {
     //         .send({
     //             "title": "Beautiful title4",
     //             "shortDescription": "Some interesting description4",
-    //             "content": "Useful content4",
+    //             "content": "Useful content4"
     //         })
     //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
     //         .expect(201)
@@ -494,7 +492,6 @@ describe('/posts', () => {
     //
     //     const createResponse = await request(app)
     //         .get(`/blogs/${createdBlogs.id}/posts?pageSize=2&sortBy=title&sortDirection=asc`)
-    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
     //         .expect(200)
     //
     //     const createdPageWithPosts = createResponse.body
@@ -526,7 +523,7 @@ describe('/posts', () => {
     //         .send({
     //             "title": "Beautiful title4",
     //             "shortDescription": "Some interesting description4",
-    //             "content": "Useful content4",
+    //             "content": "Useful content4"
     //         })
     //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
     //         .expect(201)
@@ -557,7 +554,6 @@ describe('/posts', () => {
     //
     //     const createResponse = await request(app)
     //         .get(`/blogs/${createdBlogs.id}/posts?pageSize=2&sortBy=title&sortDirection=asc&pageNumber=2`)
-    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
     //         .expect(200)
     //
     //     const createdPageWithPosts = createResponse.body
@@ -570,9 +566,9 @@ describe('/posts', () => {
     //         items: expectItems
     //     })
     // })
-
-    // Method PUT
-
+    //
+    // // Method PUT
+    //
     // it('Method PUT /blogs by id. Expected 401 - unauthorized', async () => {
     //     await request(app)
     //         .put('/blogs/' + '0')
@@ -659,9 +655,9 @@ describe('/posts', () => {
     //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
     //         .expect(204)
     // })
-
-    // Method DELETE
-
+    //
+    // // Method DELETE
+    //
     // it('Method DELETE /blogs.Expect 404 - blog not found', async ()=> {
     //     await request(app)
     //         .delete('/blogs/0')
@@ -674,11 +670,11 @@ describe('/posts', () => {
     //         .delete('/blogs/0')
     //         .expect(401)
     // })
-
-    // Posts router test
-
-    // Method POST
-
+    //
+    // // Posts router test
+    //
+    // // Method POST
+    //
     // it('Method POST /posts. Expected 401 - unauthorized', async  () => {
     //     await request(app)
     //         .post('/posts')
@@ -757,11 +753,1180 @@ describe('/posts', () => {
     //
     //     expect(post.body).toEqual(createdPost)
     // })
+    //
+    // it('Method POST /posts/postId/comments + POST /users`with 201 + POST /auth with 200. Expect 404 - Post with this ID doesn`t exist', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     await request(app)
+    //         .post('/posts/0/comments')
+    //         .send({
+    //             "content": "sn3uq3TtYPZSRMO51ouM" // 20
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(404)
+    // })
+    //
+    // it('Method POST /posts/postId/comments + POST /users`with 201 + POST /auth with 200. Expect 401 - Unauthorized', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     await request(app)
+    //         .post('/posts/0/comments')
+    //         .send({
+    //             "content": "sn3uq3TtYPZSRMO51ouM" // 20
+    //         })
+    //         .expect(401)
+    // })
+    //
+    // it('Method POST /posts/postId/comments + POST /users`with 201 + POST /auth with 200. Expect 400 - So short input values', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createResponse = await request(app)
+    //         .post('/posts/0/comments')
+    //         .send({
+    //             "content": "sn3uq3TtYPZSRMO51ou" // 19
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "content"
+    //             }
+    //         ]
+    //     })
+    // })
+    //
+    // it('Method POST /posts/postId/comments + POST /users`with 201 + POST /auth with 200. Expect 400 - So long input values', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createResponse = await request(app)
+    //         .post('/posts/0/comments')
+    //         .send({
+    //             "content": "tngMx9qTDl9Uo5S2XvFmc2TensV8Jl7OED8xhqw4OZCqTTKkd5AuZfJ47AFxtmuuo5EIM8sc0GBDIFqJWgfVVoct8RdvssC1l5lB1mdTjwfRBRgtUGpUOMB5bZarTCjMvVvGKiCWfVgQqtKCzXSqhVrebd3PIpkYXvx5tR3jOu3doTo3xHqvT5q4p5dLvVglYWLhJLnk2fvQIbT38OrEfWV6E0RBYuSuDWE7dSVAqnRU30wTIQ10Ht6HYjB21Ppf0zf2cmEJCm4SfIbqL3phsQ765rs6OYCoSbDXJ1EaJJb9I" // 301
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "content"
+    //             }
+    //         ]
+    //     })
+    // })
+    //
+    // it('Method POST /posts/postId/comments + POST /users`with 201 + POST /auth with 200 + GET /comments by ID 200. Expect 400 - So long input values', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //         const createNewPost = await request(app)
+    //             .post('/posts')
+    //             .send({
+    //                 "title": "Beautiful title",
+    //                 "shortDescription": "Some interesting description",
+    //                 "content": "Useful content",
+    //                 "blogId": createNewBlog.body.id
+    //             })
+    //             .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //             .expect(201)
+    //
+    //     const createResponse = await request(app)
+    //         .post(`/posts/${createNewPost.body.id}/comments`)
+    //         .send({
+    //             "content": "koPcJQy6fNYWkxAK09XN" // 20
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const createdComment = await request(app)
+    //         .get(`/comments/${createResponse.body.id}`)
+    //         .expect(200)
+    //
+    //     expect(createResponse.body).toEqual(createdComment.body)
+    // })
+    //
+    // // Method GET
+    //
+    // it('Method GET /posts without input query parameters. ' +
+    //          'Expected 200 - return page with blogs ', async () => {
+    //
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createdBlog = createBlog.body
+    //
+    //     const createPost1 = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title2",
+    //             "shortDescription": "Some interesting description2",
+    //             "content": "Useful content2",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost2 = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title1",
+    //             "shortDescription": "Some interesting description1",
+    //             "content": "Useful content1",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const expectItems = [createPost2.body, createPost1.body]
+    //
+    //     const givePageWithPosts = await request(app)
+    //         .get('/posts')
+    //         .expect(200)
+    //
+    //     const createdPageWithPosts = givePageWithPosts.body
+    //
+    //     expect(createdPageWithPosts).toEqual({
+    //         pagesCount: 1,
+    //         page: 1,
+    //         pageSize: 10,
+    //         totalCount: 2,
+    //         items: expectItems
+    //     })
+    // })
+    //
+    // it('Method GET /posts  with pageSize=2&sortBy=title&sortDirection=asc' +
+    //     'Expect 200 - return page with 2 posts', async () => {
+    //
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createdBlog = createNewBlog.body
+    //
+    //     await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title4",
+    //             "shortDescription": "Some interesting description4",
+    //             "content": "Useful content4",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost2 = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title3",
+    //             "shortDescription": "Some interesting description3",
+    //             "content": "Useful content3",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost3 = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title2",
+    //             "shortDescription": "Some interesting description2",
+    //             "content": "Useful content2",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const expectItems = [createPost3.body, createPost2.body]
+    //
+    //     const createResponse = await request(app)
+    //         .get('/posts?pageSize=2&sortBy=title&sortDirection=asc')
+    //         .expect(200)
+    //
+    //     const createdPageWithPosts = createResponse.body
+    //
+    //     expect(createdPageWithPosts).toEqual({
+    //         pagesCount: 2,
+    //         page: 1,
+    //         pageSize: 2,
+    //         totalCount: 3,
+    //         items: expectItems
+    //     })
+    // })
+    //
+    // it('Method GET /posts  with pageSize=2&sortBy=title&sortDirection=asc&pageNumber=2' +
+    //     'Expect 200 - return page with 1 posts', async () => {
+    //
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createdBlog = createNewBlog.body
+    //
+    //     const createPost1 = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title4",
+    //             "shortDescription": "Some interesting description4",
+    //             "content": "Useful content4",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title3",
+    //             "shortDescription": "Some interesting description3",
+    //             "content": "Useful content3",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title2",
+    //             "shortDescription": "Some interesting description2",
+    //             "content": "Useful content2",
+    //             "blogId": createdBlog.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const expectItems = [createPost1.body]
+    //
+    //     const createResponse = await request(app)
+    //         .get('/posts?pageSize=2&sortBy=title&sortDirection=asc&pageNumber=2')
+    //         .expect(200)
+    //
+    //     const createdPageWithPosts = createResponse.body
+    //
+    //     expect(createdPageWithPosts).toEqual({
+    //         pagesCount: 2,
+    //         page: 2,
+    //         pageSize: 2,
+    //         totalCount: 3,
+    //         items: expectItems
+    //     })
+    // })
+    //
+    // it('Method GET /posts by ID. Expect 404', async () => {
+    //     await request(app)
+    //         .get('/posts/0')
+    //         .expect(404)
+    // })
+    //
+    // it('Method GET /posts/postId/comments. Expect 404', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createResponse = await request(app)
+    //         .post(`/posts/0/comments`)
+    //         .send({
+    //             "content": "koPcJQy6fNYWkxAK09XN" // 20
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(404)
+    // })
+    //
+    // it('Method GET /posts/postId/comments without input query parameters.' +
+    //     'Expect 200', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createComment1 = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "1koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const createComment2 = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "2koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const expectItems = [createComment2.body, createComment1.body]
+    //
+    //     const createResponse = await request(app)
+    //         .get(`/posts/${createPost.body.id}/comments`)
+    //         .expect(200)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         pagesCount: 1,
+    //         page: 1,
+    //         pageSize: 10,
+    //         totalCount: 2,
+    //         items: expectItems
+    //     })
+    // })
+    //
+    // it('Method GET /posts/postId/comments with pageSize=2&sortDirection=asc.' +
+    //     'Expect 200 - return page with 2 comments', async () => {
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createComment1 = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "1koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const createComment2 = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "2koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "3koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const expectItems = [createComment1.body, createComment2.body]
+    //
+    //     const createResponse = await request(app)
+    //         .get(`/posts/${createPost.body.id}/comments?pageSize=2&sortDirection=asc`)
+    //         .expect(200)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         pagesCount: 2,
+    //         page: 1,
+    //         pageSize: 2,
+    //         totalCount: 3,
+    //         items: expectItems
+    //     })
+    // })
+    //
+    // it('Method GET /posts/postId/comments with pageSize=2&sortDirection=asc&pageNumber=2.' +
+    //     'Expect 200 - return page with 1 comment', async () => {
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "1koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "2koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const createComment3 = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "3koPcJQy6fNYWkxAK09XN"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const expectItems = [createComment3.body]
+    //
+    //     const createResponse = await request(app)
+    //         .get(`/posts/${createPost.body.id}/comments?pageSize=2&sortDirection=asc&pageNumber=2`)
+    //         .expect(200)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         pagesCount: 2,
+    //         page: 2,
+    //         pageSize: 2,
+    //         totalCount: 3,
+    //         items: expectItems
+    //     })
+    // })
+    //
+    // // Method PUT
+    //
+    // it('Method PUT /posts/id. Expected 404 - Not found', async () => {
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .put('/posts/0')
+    //         .send({
+    //             "title": "New beautiful title",
+    //             "shortDescription": "New some interesting description",
+    //             "content": "New useful content",
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(404)
+    // })
+    //
+    // it('Method PUT /posts/id. Expect 401 - Unauthorized', async () => {
+    //     await request(app)
+    //         .put('/posts/0')
+    //         .send({
+    //             "title": "New beautiful title",
+    //             "shortDescription": "New some interesting description",
+    //             "content": "New useful content",
+    //             "blogId": 0
+    //         })
+    //         .expect(401)
+    // })
+    //
+    // it('Method PUT /posts/id. Expect 400 - so short input values', async () => {
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createResponse = await request(app)
+    //         .put('/posts/0')
+    //         .send({
+    //             "title": "",
+    //             "shortDescription": "",
+    //             "content": "",
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({"errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "title"
+    //             },
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "shortDescription"
+    //             },
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "content"
+    //             }
+    //         ]})
+    // })
+    //
+    // it('Method PUT /posts/id. Expect 400 - so long input values', async () => {
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createResponse = await request(app)
+    //         .put(`/posts/${createNewBlog.body.id}`)
+    //         .send({
+    //             "title": "4ONI9yRQpNxbr0JfYDBdnb2De9FWBFw", // 31
+    //             "shortDescription": "OlIBxLoSrR78oDhWvK2vDT8aM1gInMlLSsau0QJH5DY7WX0A5LXOxgepj8Pu3heHVGuqbxiLtwi0CwFGaZAzahhySjbNnIEN1VVLx", // 101
+    //             "content": "owEJXzuOKxXs4iqrRy6C29bGmIdYH38Al5rMhXVnGsLN5lmrEeMC0tuczoUcEI3iGQSeZuP6bPVGQkL9IAvXmsMktrfg2eXtOnsSPKyuuJCMdATfKctpIvvvCYadFdotLCzi4NnErZ7PI3gg4zkSTtt6XdJ7GCHPGnBGlsg8GbOTQ4GCVWpBGEqKhkCbdKhSgYYAtfvIc3pgcZskRFtS6MYSLmGQH7fmlYSazno0l1LS9y8Wn0cjSAK6SiklPIb5jS8lnMBG3HqAYHOb3Vxi8fG5m7Tq9U5Cnj8F9ZnSJ2dD4MjXLVz8vxxb4cS50xQWEDLTcLEABbSScHggQ8YmJp9Py3FJsT7SUICaJuBi1YsNnnVWRlpsnwm9lnYOmHc7vxFR4ulUx39rgBcKC2CPMd0zIAZoSn2B6DUzYapi5MxdJGBxJv1i5F1mK8qvlFWO13lbpxdZHo8xX8JlbAqvhmoM4xPfoBIQ8o4ADuzabvFBKFVDVML3KGz6KFI9lxu3SZXiDssRK3TqhKHwYhjIhIh3GtZUFjym0f9n9L6mKrrSAOhHrHCerdmIcP9s0kZBmvJsYZx5NPJh95DqQDb6raqe3n5QlPZKfv4tTT73xIiIx5owTltJcsVfvT8umK4ikMqiwStCSOq7UvPR1SSNTl9aB0cAxZjoXCE429DHOLRmAHSdJCxY9vEnYB5hIpk5rNOtc7VfELVJdBQ1WGRb2bjbnPk0ze5Eye4sWksW8BVsazBLHksvwsI9QdvlUm2cBpdDyV9uh9fJZWlMsvsW5vK8Gsh8YSCBuXjGHAgHkgegiOIAZI2L0XC8oTMoyxnELK0Pj3ZYJajGk37YfFrbCasvttgMahQ76iNtE0pmGhU5uq8KquAI1q77ZBD4NuVyKQqwppqsiJ1yyxK3ZSuBNV5qZJvvcf9ETG70tJAtgeu26p15gwZBjuMJlChaF81pPaAQvZxK4vQJruv0IsG20DqbryAAguzEqOxmQLYGR", // 1001
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(400)
+    //
+    //         expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //                 {
+    //                     "message": expect.any(String),
+    //                     "field": "title"
+    //                 },
+    //                 {
+    //                     "message": expect.any(String),
+    //                     "field": "shortDescription"
+    //                 },
+    //                 {
+    //                     "message": expect.any(String),
+    //                     "field": "content"
+    //                 }
+    //             ]
+    //         })
+    // })
+    //
+    // it('Method PUT /posts/id + GET by id. Expect 204', async () => {
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createNewPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .put(`/posts/${createNewPost.body.id}`)
+    //         .send({
+    //             "title": "New beautiful title",
+    //             "shortDescription": "New some interesting description",
+    //             "content": "New useful content",
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(204)
+    //
+    //     const updatedPost = request(app)
+    //         .get(`/posts/${createNewPost.body.id}`)
+    //         .expect(200)
+    //
+    //     expect(createNewPost.body).not.toEqual(updatedPost)
+    // })
+    //
+    // // Method DELETE
+    //
+    // it('Method DELETE /posts/id. Expect 404', async () => {
+    //     await request(app)
+    //         .delete('/posts/0')
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(404)
+    // })
+    //
+    // it('Method DELETE /posts/id. Expect 401', async () => {
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createNewPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/posts/${createNewPost.body.id}`)
+    //         .expect(401)
+    // })
+    //
+    // it('Method DELETE /posts/id. Expect 204', async () => {
+    //     const createNewBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createNewPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createNewBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/posts/${createNewPost.body.id}`)
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(204)
+    // })
+
+    // Users router test
+
+    // Method POST (Test for 201 in create comments for posts)
+
+    // it('Method POST /users. Expect 401 - Unauthorized', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .expect(401)
+    // })
+    //
+    // it('Method POST /users. Expect 400 - So short input values', async () => {
+    //     const createResponse = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "lo",
+    //             "password": "passw",
+    //             "email": "someonemailgmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "login"
+    //             },
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "password"
+    //             },
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "email"
+    //             }
+    //         ]
+    //     })
+    // })
+    //
+    // it('Method POST /users. Expect 400 - So long input values', async () => {
+    //     const createResponse = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "hah6nJkNgfm", // 11
+    //             "password": "75mqX94KL7rMIS1XnlbKU", // 21
+    //             "email": "someonemailgmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "login"
+    //             },
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "password"
+    //             },
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "email"
+    //             }
+    //         ]
+    //     })
+    // })
+    //
+    // // Method GET
+    //
+    // it('Method GET /users without input query parameters.' +
+    //     'Expect 200 - return page with users',async () => {
+    //
+    //     const createUser1 = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login2",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createUser2 = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login1",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const expectItems = [createUser2.body, createUser1.body]
+    //
+    //     const pageWithUsers = await request(app)
+    //         .get('/users')
+    //         .expect(200)
+    //
+    //     expect(pageWithUsers.body).toEqual({
+    //         pagesCount: 1,
+    //         page: 1,
+    //         pageSize: 10,
+    //         totalCount: 2,
+    //         items: expectItems
+    //     })
+    // })
+
+    it('Method GET /users with searchLoginTerm=new&pageSize=2&sortBy=login&sortDirection=asc.' +
+             'Expect 200 - return page with 2 users', async () => {
+
+        await request(app)
+            .post('/users')
+            .send({
+                "login": "login4",
+                "password": "password4",
+                "email": "someonemail4@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        await request(app)
+            .post('/users')
+            .send({
+                "login": "New login3",
+                "password": "password3",
+                "email": "someonemail3@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        const createUser3 = await request(app)
+            .post('/users')
+            .send({
+                "login": "New login2",
+                "password": "password2",
+                "email": "someonemail2@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        const createUser4 = await request(app)
+            .post('/users')
+            .send({
+                "login": "New login1",
+                "password": "password1",
+                "email": "someonemail1@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        const expectItems = [createUser4.body, createUser3.body]
+
+        const pageWithUsers = await request(app)
+            .get('/users?searchLoginTerm=new&pageSize=2&sortBy=login&sortDirection=asc')
+            .expect(200)
+        console.log('-----> pageWithUsers: ', pageWithUsers.body)
+
+        expect(pageWithUsers.body).toEqual({
+            pagesCount: 2,
+            page: 1,
+            pageSize: 2,
+            totalCount: 3,
+            items: expectItems
+        })
+    }) // Не работает сортировка
+
+    it('Method GET /users with searchEmailTerm=new&pageSize=2&sortDirection=asc&pageNumber=2.' +
+             'Expect 200 - return page with 1 user', async () => {
+
+        await request(app)
+            .post('/users')
+            .send({
+                "login": "login4",
+                "password": "password4",
+                "email": "someonemail4@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        const createUser2 = await request(app)
+            .post('/users')
+            .send({
+                "login": "New login3",
+                "password": "password3",
+                "email": "newsomeonemail3@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        await request(app)
+            .post('/users')
+            .send({
+                "login": "New login2",
+                "password": "password2",
+                "email": "newsomeonemail2@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        await request(app)
+            .post('/users')
+            .send({
+                "login": "New login1",
+                "password": "password1",
+                "email": "newsomeonemail1@gmail.com"
+            })
+            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+            .expect(201)
+
+        const expectItems = [createUser2.body]
+
+        const pageWithUsers = await request(app)
+            .get('/users?searchEmailTerm=new&pageSize=2&sortBy=email&sortDirection=asc&pageNumber=2')
+            .expect(200)
+        console.log('-----> pageWithUsers: ', pageWithUsers.body)
+        expect(pageWithUsers.body).toEqual({
+            pagesCount: 2,
+            page: 2,
+            pageSize: 2,
+            totalCount: 3,
+            items: expectItems
+        })
+    }) // Не работает сортировка
+
+    // Method DELETE
+
+    // it('Method DELETE /user/id. Expect 404', async () => {
+    //     await request(app)
+    //         .delete('/users/0')
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(404)
+    // })
+    //
+    // it('Method DELETE /user/id. Expect 401', async () => {
+    //     const createUser = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/users/${createUser.body.id}`)
+    //         .expect(401)
+    // })
+    //
+    // it('Method DELETE /user/id. Expect 204', async () => {
+    //     const createUser = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/users/${createUser.body.id}`)
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(204)
+    // })
+
+// Auth router test
+
+    // Method POST (200 in /posts/postId/comments)
+
+    it('Method POST /auth/login. Expect 401 - wrong password or login', async () => {
+
+    })
+
+    it('Method POST /auth/login. Expect 400 - incorrect input value', async () => {
+
+    })
+
+    it('Method POST /auth/registration-confirmation. Expect 400 - incorrect input value', async () => {
+
+    })
+
+    it('Method POST /auth/registration-confirmation. Expect 204 - Email was verified.' +
+        'Account was activated', async () => {
+
+    })
+
+    it('Method POST /auth/registration. Expect 400 - so short input value', async () => {
+
+    })
+
+    it('Method POST /auth/registration. Expect 400 - so long input value', async () => {
+
+    })
+
+    it('Method POST /auth/registration. Expect 204 - Input data is accepted.' +
+        'Email with confirmation code will be send to passed email address', async () => {
+
+    })
+
+    it('Method POST /auth/registration-email-resending. Expect 400 - incorrect input value',
+        async () => {
+
+    })
+
+    it('Method POST /auth/registration-email-resending. Expect 204 - Input data is accepted.' +
+        'Email with confirmation code will be send to passed email address.',async () => {
+
+    })
+
+    it('Method POST /auth/me. Expect 401 - Unauthorized', async () => {
+
+    })
+
+    it('Method POST /auth/me. Expect 200 - return info about me', async () => {
+
+    })
+
+// Comment router test
 
     // Method GET
 
-    it('Method GET /posts without input query parameters. ' +
-             'Expected 200 - return page with blogs ', async () => {
+    it('Method GET /comments/commentId. Expect 404 - not found', async () => {
         const createBlog = await request(app)
             .post('/blogs')
             .send({
@@ -771,44 +1936,71 @@ describe('/posts', () => {
             .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
             .expect(201)
 
-        const createdBlog = createBlog.body
-
-        const createPost1 = await request(app)
-            .post('posts')
-            .set({
-                "title": "Beautiful title2",
-                "shortDescription": "Some interesting description2",
-                "content": "Useful content2",
-                "blogId": createdBlog.id
+        const createPost = await request(app)
+            .post('/posts')
+            .send({
+                "title": "Beautiful title",
+                "shortDescription": "Some interesting description",
+                "content": "Useful content",
+               "blogId": createBlog.body.id
             })
             .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
             .expect(201)
 
-        const createPost2 = await request(app)
-            .post('posts')
-            .set({
-                "title": "Beautiful title1",
-                "shortDescription": "Some interesting description1",
-                "content": "Useful content1",
-                "blogId": createdBlog.id
+        const createComment = await request(app)
+            .post(`/posts/${createPost.body.id}`)
+            .send({
+                "content": "99CzC2jxKwy6iAZqNMvf"
             })
-            .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
-            .expect(201)
+    })
 
-        const expectItems = [createPost2, createPost1]
+    it('Method GET /comments/commentId. Expect 200 - return comment', async () => {
 
-        const givePageWithPosts = await request(app)
-            .get('/posts')
-            .expect(200)
+    })
 
-        const createdPageWithPosts = givePageWithPosts.body
+    // Method PUT
 
-        expect(createdPageWithPosts).toEqual({
-            pagesCount: 1,
-            page: 1,
-            pageSize: 10,
-            totalCount: 2,
-            items: expectItems
-        })
+    it('Method PUT /comments/commentId. Expect 404 - not found', async () => {
+
+    })
+
+    it('Method PUT /comments/commentId.' +
+        'Expect 403 - If try edit the comment that is not your own', async () => {
+
+    })
+
+    it('Method PUT /comments/commentId. Expect 401 - Unauthorized', async () => {
+
+    })
+
+    it('Method PUT /comments/commentId. Expect 400 - So short input value', async () => {
+
+    })
+
+    it('Method PUT /comments/commentId. Expect 400 - So long input value', async () => {
+
+    })
+
+    it('Method PUT /comments/commentId. Expect 204 - content is update', async () => {
+
+    })
+
+    // Method DELETE
+
+    it('Method DELETE /comments/commentId. Expect 404 - not found', async () => {
+
+    })
+
+    it('Method DELETE /comments/commentId.' +
+        'Expect 403 - If try edit the comment that is not your own', async () => {
+
+    })
+
+    it('Method DELETE /comments/commentId. Expect 401 - Unauthorized', async () => {
+
+    })
+
+    it('Method DELETE /comments/commentId. Expect 204 - content is delete', async () => {
+
     })
 })
