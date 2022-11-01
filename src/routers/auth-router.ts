@@ -6,6 +6,7 @@ import {getAuthRouterMiddleware,
         postAuthRouterMiddleware,
         postRegistrationMiddleware,
         postResendingRegistrationEmailMiddleware} from "../middlewares/authRouter-middleware";
+import {cookie} from "express-validator";
 
 export const authRouter = Router({})
 
@@ -13,8 +14,8 @@ authRouter.post('/login',
     postAuthRouterMiddleware,
     async (req: Request, res: Response) => {
 
-        const accessToken = await jwsService.createJWT(req.user!, 10) // поменять потом на 10
-        const refreshToken = await jwsService.createJWT(req.user!, 20) // поменять потом на 20
+        const accessToken = await jwsService.createJWT(req.user!, 10000) // поменять потом на 10
+        const refreshToken = await jwsService.createJWT(req.user!, 20000) // поменять потом на 20
 
         return res.status(200)
             .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
@@ -60,7 +61,7 @@ authRouter.post('/registration-email-resending',
 )
 
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
-    const userId = await jwsService.getUserIdByToken(req.cookies.refreshToken)
+    const userId = await jwsService.getUserIdByToken(req.cookies)
 
     const user = await usersService.giveUserById(userId)
 
@@ -68,10 +69,10 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
         return res.sendStatus(401)
     }
 
-    await jwsService.removeRefreshToken(req.cookies.refreshToken)
+    await jwsService.removeRefreshToken(req.cookies)
 
-    const accessToken = await jwsService.createJWT(user, 10) // поменять потом на 10
-    const refreshToken = await jwsService.createJWT(user, 20) // поменять потом на 20
+    const accessToken = await jwsService.createJWT(user, 10000) // поменять потом на 10
+    const refreshToken = await jwsService.createJWT(user, 20000) // поменять потом на 20
 
     return res.status(200)
         .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})

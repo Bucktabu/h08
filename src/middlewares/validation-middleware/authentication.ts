@@ -9,15 +9,19 @@ export const authentication = async (req: Request, res: Response, next: NextFunc
         return res.sendStatus(401)
     }
 
-    const token = req.headers.authorization.split(' ')[1]
+    const accessToken = req.headers.authorization.split(' ')[1]
 
-    const userId = await jwsService.getUserIdByToken(token)
-
+    const userId = await jwsService.getUserIdByToken(accessToken)
+    console.log('-----> userId: ', userId)
     if (!userId) {
         return res.sendStatus(401)
     }
 
     const user: any = await usersService.giveUserById(userId)
+
+    if (!user) {
+        return res.sendStatus(401)
+    }
 
     req.user = user
     res.locals = user

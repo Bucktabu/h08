@@ -10,7 +10,7 @@ export const jwsService = {
 
     async getUserIdByToken(token: string) {
         try {
-            const result: any = jwt.verify(token, settings.JWT_SECRET)
+            const result: any = await jwt.verify(token, settings.JWT_SECRET)
             console.log('-----> result: ', result)
             return result.userId
         } catch (error) {
