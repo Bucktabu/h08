@@ -88,9 +88,13 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 })
 
 authRouter.post('/logout', async (req: Request, res: Response) => {
-    const userId = await jwsService.getUserIdByToken(req.cookies.refreshToken)
+    const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
 
-    const user = await usersService.giveUserById(userId)
+    if (!userInfo) {
+        return res.sendStatus(401)
+    }
+
+    const user = await usersService.giveUserById(userInfo.userId)
 
     if (!user) {
         return res.sendStatus(401)
