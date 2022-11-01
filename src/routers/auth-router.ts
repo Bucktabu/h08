@@ -13,10 +13,12 @@ authRouter.post('/login',
     postAuthRouterMiddleware,
     async (req: Request, res: Response) => {
 
-        const accessToken = await jwsService.createJWT(req.user!, 432000) // поменять потом на 10
-        const refreshToken = await jwsService.createJWT(req.user!, 432000) // поменять потом на 20
+        const accessToken = await jwsService.createJWT(req.user!, 10) // поменять потом на 10
+        const refreshToken = await jwsService.createJWT(req.user!, 20) // поменять потом на 20
 
-        return res.status(200).cookie('refreshToken', refreshToken, {secure:true, httpOnly: true}).send({accessToken: accessToken}) // должны ли приходить куки если 401 ошибка
+        return res.status(200)
+            .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
+            .send({accessToken: accessToken})
     }
 )
 
@@ -26,7 +28,7 @@ authRouter.post('/registration',
 
         const result = await authService.createUser(req.body.login, req.body.password, req.body.email)
 
-        return res.status(204).send({result})
+        return res.status(204).send(result)
     }
 )
 
@@ -39,7 +41,7 @@ authRouter.post('/registration-confirmation',
             return res.status(400).send({errorsMessages: [{ message: 'Bad Request', field: "code" }]})
         }
 
-        return res.status(204).send({emailConfirmed})
+        return res.status(204).send(emailConfirmed)
     }
 )
 
@@ -53,20 +55,48 @@ authRouter.post('/registration-email-resending',
             return res.sendStatus(400)
         }
 
-        return res.status(204).send({result})
+        return res.status(204).send(result)
     }
 )
 
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
-    const user = jwsService.getUserIdByToken(req.cookies.refreshToken)
+    const userId = await jwsService.getUserIdByToken(req.cookies.refreshToken)
+
+    const user = await usersService.giveUserById(userId)
+
+    if (!user) {
+        return res.sendStatus(401)
+    }
+
+    await jwsService.removeRefreshToken(req.cookies.refreshToken)
+
+    const accessToken = await jwsService.createJWT(user, 10) // поменять потом на 10
+    const refreshToken = await jwsService.createJWT(user, 20) // поменять потом на 20
+
+    return res.status(200)
+        .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
+        .send({accessToken: accessToken})
+})
+
+authRouter.post('/logout', async (req: Request, res: Response) => {
+    const userId = await jwsService.getUserIdByToken(req.cookies.refreshToken)
+
+    const user = await usersService.giveUserById(userId)
+
+    if (!user) {
+        return res.sendStatus(401)
+    }
+
+    await jwsService.removeRefreshToken(req.cookies.refreshToken)
+
+    return res.sendStatus(204)
 })
 
 authRouter.get('/me',
     getAuthRouterMiddleware,
     async (req: Request, res: Response) => {
         const aboutMe = await usersService.aboutMe(req.user!)
-        console.log('-----> aboutMe: ', aboutMe)
 
-        return res.status(200).send({aboutMe}) // почему в бади не выводит
+        return res.status(200).send({aboutMe})
     }
 )

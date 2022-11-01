@@ -35,7 +35,7 @@ export const authService = {
             }
         } // структура
 
-        console.log('confirmationCode:', userAccount.emailConfirmation.confirmationCode)
+        console.log('-----> confirmationCode: ', userAccount.emailConfirmation.confirmationCode)
 
         const createdAccount = await this.createUserAccount(userAccount)
 
@@ -72,6 +72,7 @@ export const authService = {
 
     async createUserAccount(userAccount: UserAccountType) {
         const user = await usersRepository.createNewUser(userAccount.accountData)
+
         const emailConfirmation = await emailConfirmationRepository.createEmailConfirmation(userAccount.emailConfirmation)
 
         if (!user || !emailConfirmation) {

@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import any = jasmine.any;
 
 export const giveSkipNumber = (pageNumber: string,
                                pageSize: string) => {
@@ -13,7 +14,3 @@ export const givePagesCount = (totalCount: number, pageSize: string) => {
 export const _generateHash = async (password: string, salt: string) => {
     return await bcrypt.hash(password, salt)
 }
-
-// export const _generateHashWithoutSalt = async (password: string) => {
-//     const hash = bcrypt.hashSync(password, 10);
-// }

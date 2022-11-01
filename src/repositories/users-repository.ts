@@ -1,7 +1,6 @@
-import {emailConfirmCollection, usersCollection} from "./db";
+import {usersCollection} from "./db";
 import {UserDBType, UsersType} from "../types/user-type";
 import {giveSkipNumber} from "../helperFunctions";
-import {UserAccountType} from "../types/user-account-type";
 
 export const usersRepository = {
     async createNewUser(newUser: UserDBType): Promise<UserDBType | null> {
@@ -19,13 +18,10 @@ export const usersRepository = {
                     pageSize: string,
                     searchLoginTerm: string,
                     searchEmailTerm: string): Promise<UsersType> {
-        // проверить на существование term
+
         return await usersCollection
-            .find({
-                $or: [
-                    {login: {$regex: searchLoginTerm, $options: 'i'}},
-                    {email: {$regex: searchEmailTerm, $options: 'i'}}]
-                },
+            .find({$and: [{login: {$regex: searchLoginTerm, $options: 'i'}},
+                               {email: {$regex: searchEmailTerm, $options: 'i'}}]},
                 {projection: {_id: false, passwordHash: false, passwordSalt: false}})
             .sort(sortBy, sortDirection === 'asc' ? 1 : -1)
             .skip(giveSkipNumber(pageNumber, pageSize))
@@ -34,7 +30,9 @@ export const usersRepository = {
     },
 
     async giveTotalCount(searchLoginTerm: string, searchEmailTerm: string): Promise<number> {
-        return await usersCollection.countDocuments({$or: [{login: {$regex: searchLoginTerm, $options: 'i'}}, {email: {$regex: searchEmailTerm, $options: 'i'}}]})
+        return await usersCollection
+            .countDocuments({$and: [{login: {$regex: searchLoginTerm, $options: 'i'}},
+                                         {email: {$regex: searchEmailTerm, $options: 'i'}}]})
     },
 
     async giveUserById(id: string): Promise<UserDBType | null> {
@@ -44,7 +42,6 @@ export const usersRepository = {
     async giveUserByLoginOrEmail(loginOrEmail: string) {
         return await usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
     },
-
 
     async deleteUserById(userId: string): Promise<boolean> {
         const result = await usersCollection.deleteOne({id: userId})

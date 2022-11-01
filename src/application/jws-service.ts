@@ -1,14 +1,11 @@
 import jwt from 'jsonwebtoken'
 import {UserDBType} from "../types/user-type";
 import {settings} from "../settings";
+import {jwtBlackList} from "../repositories/jwtBlackList";
 
 export const jwsService = {
-    async createJWT(user: UserDBType, timeToeExpired: number) {
-        return jwt.sign({userId: user.id}, settings.JWT_SECRET, {expiresIn: `${timeToeExpired}s`})
-    },
-
-    async checkJWT(refreshToken: string) {
-        return jwt.verify(refreshToken, settings.JWT_SECRET)
+    async createJWT(user: UserDBType, timeToExpired: number) {
+        return jwt.sign({userId: user.id}, settings.JWT_SECRET, {expiresIn: `${timeToExpired}s`})
     },
 
     async getUserIdByToken(token: string) {
@@ -19,5 +16,9 @@ export const jwsService = {
         } catch (error) {
             return null
         }
+    },
+
+    async removeRefreshToken(refreshToken: string) {
+        return jwtBlackList.removeRefreshToken(refreshToken)
     }
 }

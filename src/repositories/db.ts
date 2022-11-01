@@ -8,6 +8,7 @@ import {PostType} from "../types/posts-type";
 import {UserDBType} from "../types/user-type";
 import {UserAccountType} from "../types/user-account-type";
 import {EmailConfirmationType} from "../types/email-confirmation-type";
+import {TokenType} from "../types/token-type";
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://0.0.0.0:27017/?maxPoolSize=20&w=majority';
 
@@ -18,6 +19,7 @@ export const emailConfirmCollection = db.collection<EmailConfirmationType>('emai
 export const blogsCollection = db.collection<BlogType>('blogs')
 export const commentsCollection = db.collection<CommentBDType>('comments')
 export const postsCollection = db.collection<PostType>('posts')
+export const tokenBlackList = db.collection<TokenType>('tokenBlackList')
 export const usersCollection = db.collection<UserDBType>('users')
 
 export async function runDb() {
