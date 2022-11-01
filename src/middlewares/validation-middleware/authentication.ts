@@ -12,7 +12,7 @@ export const authentication = async (req: Request, res: Response, next: NextFunc
     const accessToken = req.headers.authorization.split(' ')[1]
 
     const userId = await jwsService.getUserIdByToken(accessToken)
-    console.log('-----> userId: ', userId)
+
     if (!userId) {
         return res.sendStatus(401)
     }

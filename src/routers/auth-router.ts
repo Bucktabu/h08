@@ -14,8 +14,8 @@ authRouter.post('/login',
     postAuthRouterMiddleware,
     async (req: Request, res: Response) => {
 
-        const accessToken = await jwsService.createJWT(req.user!, 10000) // поменять потом на 10
-        const refreshToken = await jwsService.createJWT(req.user!, 20000) // поменять потом на 20
+        const accessToken = await jwsService.createJWT(req.user!, 10) // поменять потом на 10
+        const refreshToken = await jwsService.createJWT(req.user!, 20) // поменять потом на 20
 
         return res.status(200)
             .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
@@ -71,8 +71,8 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 
     await jwsService.removeRefreshToken(req.cookies)
 
-    const accessToken = await jwsService.createJWT(user, 10000) // поменять потом на 10
-    const refreshToken = await jwsService.createJWT(user, 20000) // поменять потом на 20
+    const accessToken = await jwsService.createJWT(user, 10) // поменять потом на 10
+    const refreshToken = await jwsService.createJWT(user, 20) // поменять потом на 20
 
     return res.status(200)
         .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
