@@ -60,7 +60,7 @@ authRouter.post('/registration-email-resending',
 
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 
-    const userInfo = await jwsService.getUserIdByToken(req.cookies)
+    const userInfo = await jwsService.getUserIdByToken(req.headers.cookie!)
 
     if (!userInfo) {
         return res.sendStatus(401)
