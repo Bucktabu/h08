@@ -61,51 +61,53 @@ authRouter.post('/registration-email-resending',
 
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 
-    const tokenInBlackList = await jwsService.giveToken(req.cookies.refreshToken)
+        const tokenInBlackList = await jwsService.giveToken(req.cookies.refreshToken)
+        console.log('tokenInBlackList', tokenInBlackList, req.cookies)
+        if (tokenInBlackList) {
+            return res.sendStatus(401)
+        }
 
-    if (tokenInBlackList) {
-        return res.sendStatus(401)
+        const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
+        console.log('----->', userInfo, req.cookies)
+        if (!userInfo) {
+            return res.sendStatus(401)
+        }
+
+        const user = await usersService.giveUserById(userInfo.userId)
+
+        if (!user) {
+            return res.sendStatus(401)
+        }
+
+        await jwsService.removeRefreshToken(req.cookies.refreshToken)
+
+        const accessToken = await jwsService.createJWT(user, 10) // поменять потом на 10
+        const refreshToken = await jwsService.createJWT(user, 20) // поменять потом на 20
+
+        return res.status(200)
+            .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
+            .send({accessToken: accessToken})
     }
-
-    const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
-    console.log('----->', userInfo, req.cookies)
-    if (!userInfo) {
-        return res.sendStatus(401)
-    }
-
-    const user = await usersService.giveUserById(userInfo.userId)
-
-    if (!user) {
-        return res.sendStatus(401)
-    }
-
-    await jwsService.removeRefreshToken(req.cookies.refreshToken)
-
-    const accessToken = await jwsService.createJWT(user, 10) // поменять потом на 10
-    const refreshToken = await jwsService.createJWT(user, 20) // поменять потом на 20
-
-    return res.status(200)
-        .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
-        .send({accessToken: accessToken})
-})
+)
 
 authRouter.post('/logout', async (req: Request, res: Response) => {
-    const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
+        const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
 
-    if (!userInfo) {
-        return res.sendStatus(401)
+        if (!userInfo) {
+            return res.sendStatus(401)
+        }
+
+        const user = await usersService.giveUserById(userInfo.userId)
+
+        if (!user) {
+            return res.sendStatus(401)
+        }
+
+        await jwsService.removeRefreshToken(req.cookies.refreshToken)
+
+        return res.sendStatus(204)
     }
-
-    const user = await usersService.giveUserById(userInfo.userId)
-
-    if (!user) {
-        return res.sendStatus(401)
-    }
-
-    await jwsService.removeRefreshToken(req.cookies.refreshToken)
-
-    return res.sendStatus(204)
-})
+)
 
 authRouter.get('/me',
     getAuthRouterMiddleware,
