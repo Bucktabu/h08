@@ -24,6 +24,5 @@ export const authentication = async (req: Request, res: Response, next: NextFunc
     }
 
     req.user = user
-    res.locals = user
     next()
 }

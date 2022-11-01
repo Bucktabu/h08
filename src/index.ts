@@ -8,12 +8,14 @@ import {testingRouter} from "./routers/testing-router";
 import {usersRouter} from "./routers/users-router";
 
 import {runDb} from "./repositories/db";
+import cookieParser from "cookie-parser";
 
 export const app = express()
 
 const port = process.env.PORT || 5000
 
 app.use(express.json()) // add body-parser
+app.use(cookieParser()) // add cookie-parser
 
 app.use('/auth', authRouter)
 app.use('/blogs', blogsRouter)
