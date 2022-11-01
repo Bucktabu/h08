@@ -61,6 +61,12 @@ authRouter.post('/registration-email-resending',
 
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 
+    const tokenInBlackList = await jwsService.giveToken(req.cookies.refreshToken)
+
+    if (tokenInBlackList) {
+        return res.sendStatus(401)
+    }
+
     const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
     console.log('----->', userInfo, req.cookies)
     if (!userInfo) {

@@ -18,6 +18,10 @@ export const jwsService = {
     },
 
     async removeRefreshToken(refreshToken: string) {
-        return jwtBlackList.removeRefreshToken(refreshToken)
+        return await jwtBlackList.removeRefreshToken(refreshToken)
+    },
+
+    async giveToken(refreshToken: string) {
+        return await jwtBlackList.giveToken(refreshToken)
     }
 }
