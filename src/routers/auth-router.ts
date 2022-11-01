@@ -91,6 +91,13 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 )
 
 authRouter.post('/logout', async (req: Request, res: Response) => {
+
+        const tokenInBlackList = await jwsService.giveToken(req.cookies.refreshToken)
+        console.log('tokenInBlackList', tokenInBlackList, req.cookies)
+        if (tokenInBlackList) {
+            return res.sendStatus(401)
+        }
+
         const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
 
         if (!userInfo) {
