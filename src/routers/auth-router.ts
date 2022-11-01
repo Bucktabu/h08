@@ -112,6 +112,6 @@ authRouter.get('/me',
     async (req: Request, res: Response) => {
         const aboutMe = await usersService.aboutMe(req.user!)
 
-        return res.status(200).send({aboutMe})
+        return res.status(200).send(aboutMe)
     }
 )
