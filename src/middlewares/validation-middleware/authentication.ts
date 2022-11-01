@@ -11,13 +11,13 @@ export const authentication = async (req: Request, res: Response, next: NextFunc
 
     const accessToken = req.headers.authorization.split(' ')[1]
 
-    const userId = await jwsService.getUserIdByToken(accessToken)
+    const userInfo = await jwsService.getUserIdByToken(accessToken)
 
-    if (!userId) {
+    if (!userInfo) {
         return res.sendStatus(401)
     }
 
-    const user: any = await usersService.giveUserById(userId)
+    const user: any = await usersService.giveUserById(userInfo.userId) // ругается, если я в jwt сервисе вывожу без объявления переменной
 
     if (!user) {
         return res.sendStatus(401)

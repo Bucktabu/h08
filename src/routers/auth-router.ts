@@ -6,7 +6,7 @@ import {getAuthRouterMiddleware,
         postAuthRouterMiddleware,
         postRegistrationMiddleware,
         postResendingRegistrationEmailMiddleware} from "../middlewares/authRouter-middleware";
-import {cookie} from "express-validator";
+
 
 export const authRouter = Router({})
 
@@ -16,10 +16,8 @@ authRouter.post('/login',
 
         const accessToken = await jwsService.createJWT(req.user!, 10) // поменять потом на 10
         const refreshToken = await jwsService.createJWT(req.user!, 20) // поменять потом на 20
-
-        return res.status(200)
-            .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
-            .send({accessToken: accessToken})
+        console.log('-----> refreshToken: ', refreshToken)
+        return res.status(200).cookie('refreshToken', refreshToken, {secure: true, httpOnly: true}).send({accessToken: accessToken})
     }
 )
 
@@ -61,9 +59,18 @@ authRouter.post('/registration-email-resending',
 )
 
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
-    const userId = await jwsService.getUserIdByToken(req.cookies)
 
-    const user = await usersService.giveUserById(userId)
+    const userInfo = await jwsService.getUserIdByToken(req.cookies)
+
+    if (!userInfo) {
+        return res.sendStatus(401)
+    }
+
+    if (userInfo.exp < new Date()) {
+        return res.sendStatus(401)
+    }
+
+    const user = await usersService.giveUserById(userInfo.userId)
 
     if (!user) {
         return res.sendStatus(401)
