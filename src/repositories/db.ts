@@ -15,9 +15,9 @@ const mongoUri = process.env.MONGO_URI || 'mongodb://0.0.0.0:27017/?maxPoolSize=
 const client = new MongoClient(mongoUri)
 const db = client.db('blogsAndPostsDb')
 
-export const emailConfirmCollection = db.collection<EmailConfirmationType>('emailConfirm')
 export const blogsCollection = db.collection<BlogType>('blogs')
 export const commentsCollection = db.collection<CommentBDType>('comments')
+export const emailConfirmCollection = db.collection<EmailConfirmationType>('emailConfirm')
 export const postsCollection = db.collection<PostType>('posts')
 export const tokenBlackList = db.collection<TokenType>('tokenBlackList')
 export const usersCollection = db.collection<UserDBType>('users')

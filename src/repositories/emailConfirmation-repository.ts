@@ -1,11 +1,11 @@
 import {emailConfirmCollection, usersCollection} from "./db";
 import {EmailConfirmationType} from "../types/email-confirmation-type";
-import {emailsManager} from "../managers/email-manager";
 
 export const emailConfirmationRepository = {
     async createEmailConfirmation(emailConfirmation: EmailConfirmationType) {
         try {
-            return await emailConfirmCollection.insertOne(emailConfirmation)
+            await emailConfirmCollection.insertOne(emailConfirmation)
+            return emailConfirmation
         } catch (e) {
             return null
         }

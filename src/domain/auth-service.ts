@@ -27,15 +27,13 @@ export const authService = {
                 id: userAccountId,
                 confirmationCode: uuidv4(),
                 expirationDate: add(new Date(), {
-                    hours: 24,
+                    hours: 24
                     // minutes: 1,
                     // seconds: 1
                 }),
                 isConfirmed: false
             }
-        } // структура
-
-        console.log('-----> confirmationCode: ', userAccount.emailConfirmation.confirmationCode)
+        }
 
         const createdAccount = await this.createUserAccount(userAccount)
 
@@ -65,21 +63,20 @@ export const authService = {
         }
 
         const emailConfirmation = await this.giveEmailConfirmationByCodeOrId(user.id)
-
         const userAccount = {accountData: user!, emailConfirmation: emailConfirmation!}
+
         return await emailsManager.sendConfirmationEmail(userAccount)
     },
 
     async createUserAccount(userAccount: UserAccountType) {
         const user = await usersRepository.createNewUser(userAccount.accountData)
-
         const emailConfirmation = await emailConfirmationRepository.createEmailConfirmation(userAccount.emailConfirmation)
 
         if (!user || !emailConfirmation) {
             return null
         }
 
-        return {accountData: user, emailConfirmation: emailConfirmation}
+        return {accountData: user, emailConfirmation}
     },
 
     async giveEmailConfirmationByCodeOrId(codeOrId: string) {

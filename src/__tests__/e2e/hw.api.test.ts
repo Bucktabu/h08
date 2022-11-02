@@ -1874,15 +1874,63 @@ describe('/posts', () => {
     // Method POST (200 in /posts/postId/comments)
 
     it('Method POST /auth/login. Expect 401 - wrong password or login', async () => {
-
+        const createResponse = await request(app)
+            .post('/auth/login')
+            .send({
+                "login": "NonExist",
+                "password": "NonExistent password"
+            })
+            .expect(401)
     })
 
-    it('Method POST /auth/login. Expect 400 - incorrect input value', async () => {
+    it('Method POST /auth/login. Expect 400 - So short input value', async () => {
+        const createResponse = await request(app)
+            .post('/auth/login')
+            .send({
+                "login": 'qw',
+                "password": 'qwer'
+            })
+            .expect(400)
 
+        expect(createResponse.body).toEqual({
+            "errorsMessages": [
+                {
+                    "message": expect.any(String),
+                    "field": "login"
+                },
+                {
+                    "message": expect.any(String),
+                    "field": "password"
+                }
+            ]
+        })
+    })
+
+    it('Method POST /auth/login. Expect 400 - So long input value', async () => {
+        const createResponse = await request(app)
+            .post('/auth/login')
+            .send({
+                "login": 'EEPbgyXb69t',
+                "password": 'MibmYM0VbfT0tp4uD7uZc'
+            })
+            .expect(400)
+
+        expect(createResponse.body).toEqual({
+            "errorsMessages": [
+                {
+                    "message": expect.any(String),
+                    "field": "login"
+                },
+                {
+                    "message": expect.any(String),
+                    "field": "password"
+                }
+            ]
+        })
     })
 
     it('Method POST /auth/registration-confirmation. Expect 400 - incorrect input value', async () => {
-
+        // как из отправленного емайла достать токен
     })
 
     it('Method POST /auth/registration-confirmation. Expect 204 - Email was verified.' +
@@ -1891,35 +1939,182 @@ describe('/posts', () => {
     })
 
     it('Method POST /auth/registration. Expect 400 - so short input value', async () => {
+        const createResponse = await request(app)
+            .post('/auth/registration')
+            .send({
+                "login": "Be",
+                "password": "5hucF",
+                "email": "someomegmail.com"
+            })
+            .expect(400)
 
+        expect(createResponse.body).toEqual({
+            "errorsMessages": [
+                {
+                    "message": expect.any(String),
+                    "field": "login"
+                },
+                {
+                    "message": expect.any(String),
+                    "field": "password"
+                },
+                {
+                    "message": expect.any(String),
+                    "field": "email"
+                }
+            ]
+        })
     })
 
     it('Method POST /auth/registration. Expect 400 - so long input value', async () => {
+        const createResponse = await request(app)
+            .post('/auth/registration')
+            .send({
+                "login": "akOcQv2zgk7", // 11
+                "password": "q7We3lTX9dGWHKt7eMn7i", // 21
+                "email": "someome@gmail.com"
+            })
+            .expect(400)
 
+        expect(createResponse.body).toEqual({
+            "errorsMessages": [
+                {
+                    "message": expect.any(String),
+                    "field": "login"
+                },
+                {
+                    "message": expect.any(String),
+                    "field": "password"
+                }
+            ]
+        })
     })
 
-    it('Method POST /auth/registration. Expect 204 - Input data is accepted.' +
+    it('Method POST /auth/registration. Expect 204 - Input data is accepted. ' +
         'Email with confirmation code will be send to passed email address', async () => {
+        const createResponse = await request(app)
+            .post('/auth/registration')
+            .send({
+                "login": "login",
+                "password": "password",
+                "email": "someonemail@gmail.com"
+            })
+            .expect(204)
 
+        // const emailSentInfo = createResponse.body.info.response
+        // const emailSent = (emailSentInfo.split(' '))[2].join()
+        //
+        // expect(emailSent).toEqual('OK')
     })
 
-    it('Method POST /auth/registration-email-resending. Expect 400 - incorrect input value',
+    it('Method POST /auth/registration-email-resending. Expect 400 - email is already confirmed',
         async () => {
+            await request(app)
+                .post('/auth/registration')
+                .send({
+                    "login": "login",
+                    "password": "password",
+                    "email": "someonemail@gmail.com"
+                })
+                .expect(204)
 
+            // await request(app)
+            //     .post('/auth/registration')
+            //     .send({
+            //         "code": `${тутДолженБытьКод}`
+            //     })
+            //     .expect(204)
+
+            await request(app)
+                .post('/auth/registration-email-resending')
+                .send({
+                    "email": "someonemail@gmail.com"
+                })
+                .expect(400)
+        })
+
+    it('Method POST /auth/registration-email-resending. Expect 400 - wrong email',
+        async () => {
+            await request(app)
+                .post('/auth/registration')
+                .send({
+                    "login": "login",
+                    "password": "password",
+                    "email": "someonemail@gmail.com"
+                })
+                .expect(204)
+
+            await request(app)
+                .post('/auth/registration-email-resending')
+                .send({
+                    "email": "someonemailgmail.com"
+                })
+                .expect(400)
     })
+
+    it('Method POST /auth/registration-email-resending. Expect 400 - user not exist',
+        async () => {
+            await request(app)
+                .post('/auth/registration-email-resending')
+                .send({
+                    "email": "someonemail@gmail.com"
+                })
+                .expect(400)
+        })
 
     it('Method POST /auth/registration-email-resending. Expect 204 - Input data is accepted.' +
         'Email with confirmation code will be send to passed email address.',async () => {
+        await request(app)
+            .post('/auth/registration')
+            .send({
+                "login": "login",
+                "password": "password",
+                "email": "someonemail@gmail.com"
+            })
+            .expect(204)
 
+        await request(app)
+            .post('/auth/registration-email-resending')
+            .send({
+                "email": "someonemail@gmail.com"
+            })
+            .expect(204)
     })
 
-    it('Method POST /auth/me. Expect 401 - Unauthorized', async () => {
-
-    })
-
-    it('Method POST /auth/me. Expect 200 - return info about me', async () => {
-
-    })
+    // it('Method POST /auth/me. Expect 401 - Unauthorized', async () => {
+    //     await request(app)
+    //         .get('/auth/me')
+    //         .expect(401)
+    // })
+    //
+    // it('Method POST /auth/me. Expect 200 - return info about me', async () => {
+    //     const user = await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const token = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const aboutMe = await request(app)
+    //         .get('/auth/me')
+    //         .set({Authorization: `Bearer ${token.body.accessToken}`})
+    //         .expect(200)
+    //
+    //     expect(user.body.email).toEqual(aboutMe.body.email)
+    //     expect(user.body.login).toEqual(aboutMe.body.login)
+    //     expect(user.body.id).toEqual(aboutMe.body.userId)
+    // })
 
 // Comment router test
 
@@ -1984,50 +2179,554 @@ describe('/posts', () => {
     //
     //     expect(createResponse.body).toEqual(createComment.body)
     // })
-
-    // Method PUT
-
-    it('Method PUT /comments/commentId. Expect 404 - not found', async () => {
-
-    })
-
-    it('Method PUT /comments/commentId.' +
-        'Expect 403 - If try edit the comment that is not your own', async () => {
-
-    })
-
-    it('Method PUT /comments/commentId. Expect 401 - Unauthorized', async () => {
-
-    })
-
-    it('Method PUT /comments/commentId. Expect 400 - So short input value', async () => {
-
-    })
-
-    it('Method PUT /comments/commentId. Expect 400 - So long input value', async () => {
-
-    })
-
-    it('Method PUT /comments/commentId. Expect 204 - content is update', async () => {
-
-    })
-
-    // Method DELETE
-
-    it('Method DELETE /comments/commentId. Expect 404 - not found', async () => {
-
-    })
-
-    it('Method DELETE /comments/commentId.' +
-        'Expect 403 - If try edit the comment that is not your own', async () => {
-
-    })
-
-    it('Method DELETE /comments/commentId. Expect 401 - Unauthorized', async () => {
-
-    })
-
-    it('Method DELETE /comments/commentId. Expect 204 - content is delete', async () => {
-
-    })
+    //
+    // // Method PUT
+    //
+    // it('Method PUT /comments/commentId. Expect 404 - not found', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     await request(app)
+    //         .put('/comments/0')
+    //         .send({"content": "JErsJJtdhH8AgtfZuiv9"})
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(404)
+    //
+    // })
+    //
+    // it('Method PUT /comments/commentId.' +
+    //     'Expect 403 - If try edit the comment that is not your own', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login1",
+    //             "password": "password1",
+    //             "email": "someonemail1@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const user1Registration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login1",
+    //             "password": "password1"
+    //         })
+    //         .expect(200)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login2",
+    //             "password": "password2",
+    //             "email": "someonemail2@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const user2Registration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login2",
+    //             "password": "password2"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${user1Registration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .put(`/comments/${createComment.body.id}`)
+    //         .set({Authorization: `Bearer ${user2Registration.body.accessToken}`})
+    //         .expect(403)
+    // })
+    //
+    // it('Method PUT /comments/commentId. Expect 401 - Unauthorized', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .put(`/comments/${createComment.body.id}`)
+    //         .send({"content": "JErsJJtdhH8AgtfZuiv9"})
+    //         .expect(401)
+    // })
+    //
+    // it('Method PUT /comments/commentId. Expect 400 - So short input value', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const createResponse = await request(app)
+    //         .put(`/comments/${createComment.body.id}`)
+    //         .send({"content": "JErsJJtdhH8AgtfZuiv"}) //19
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "content"
+    //             }
+    //         ]
+    //     })
+    // })
+    //
+    // it('Method PUT /comments/commentId. Expect 400 - So long input value', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const createResponse = await request(app)
+    //         .put(`/comments/${createComment.body.id}`)
+    //         .send({"content": "yrcBHEuJVqNmqNNwmTDT2iiBy6rx08ieDOiDzrGFLLIaWOvIE6BEq58DdgeqyhXoVvO0k2vZviYXvTxCFIiCqjTM1dqP6STvIopFyImrfBhgIaIIaaQwNr6DL4SC247VeORy6OgwhtWV2p6QxoJCc49nFPpTXewKFyX8qJ00FcMcmeA9G19ZgIwX9m1w57opPj3MGIWDFoW2m8dGolWAVkPrtoIjfd4gxQgvp0IKfiSPeZiJxeEhyDz6SYCPYWeObtrt9TpRDLnkCfXC9b5Tfk6aRIKz670lSoRF8BgcxeHFC"}) //301
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(400)
+    //
+    //     expect(createResponse.body).toEqual({
+    //         "errorsMessages": [
+    //             {
+    //                 "message": expect.any(String),
+    //                 "field": "content"
+    //             }
+    //         ]
+    //     })
+    // })
+    //
+    // it('Method PUT /comments/commentId. Expect 204 - content is update', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     const updateComment = await request(app)
+    //         .put(`/comments/${createComment.body.id}`)
+    //         .send({
+    //             "content": "New 99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(204)
+    //
+    //     const createResponse = await request(app)
+    //         .get(`/comments/${createComment.body.id}`)
+    //         .expect(200)
+    //
+    //     expect(createResponse.body).not.toEqual(createComment.body)
+    // })
+    //
+    // // Method DELETE
+    //
+    // it('Method DELETE /comments/commentId. Expect 404 - not found', async () => {
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     await request(app)
+    //         .delete('/comments/0')
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(404)
+    // })
+    //
+    // it('Method DELETE /comments/commentId.' +
+    //     'Expect 403 - If try edit the comment that is not your own', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login1",
+    //             "password": "password1",
+    //             "email": "someonemail1@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const user1Registration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login1",
+    //             "password": "password1"
+    //         })
+    //         .expect(200)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login2",
+    //             "password": "password2",
+    //             "email": "someonemail2@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const user2Registration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login2",
+    //             "password": "password2"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${user1Registration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/comments/${createComment.body.id}`)
+    //         .set({Authorization: `Bearer ${user2Registration.body.accessToken}`})
+    //         .expect(403)
+    // })
+    //
+    // it('Method DELETE /comments/commentId. Expect 401 - Unauthorized', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/comments/${createComment.body.id}`)
+    //         .expect(401)
+    // })
+    //
+    // it('Method DELETE /comments/commentId. Expect 204 - content is delete', async () => {
+    //     const createBlog = await request(app)
+    //         .post('/blogs')
+    //         .send({
+    //             "name": "new blog",
+    //             "youtubeUrl": "https://someurl.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const createPost = await request(app)
+    //         .post('/posts')
+    //         .send({
+    //             "title": "Beautiful title",
+    //             "shortDescription": "Some interesting description",
+    //             "content": "Useful content",
+    //             "blogId": createBlog.body.id
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .post('/users')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password",
+    //             "email": "someonemail@gmail.com"
+    //         })
+    //         .set({Authorization: 'Basic YWRtaW46cXdlcnR5'})
+    //         .expect(201)
+    //
+    //     const userRegistration = await request(app)
+    //         .post('/auth/login')
+    //         .send({
+    //             "login": "login",
+    //             "password": "password"
+    //         })
+    //         .expect(200)
+    //
+    //     const createComment = await request(app)
+    //         .post(`/posts/${createPost.body.id}/comments`)
+    //         .send({
+    //             "content": "99CzC2jxKwy6iAZqNMvf"
+    //         })
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(201)
+    //
+    //     await request(app)
+    //         .delete(`/comments/${createComment.body.id}`)
+    //         .set({Authorization: `Bearer ${userRegistration.body.accessToken}`})
+    //         .expect(204)
+    //
+    //     await request(app)
+    //         .get(`/comments/${createComment.body.id}`)
+    //         .expect(404)
+    // })
 })
