@@ -1,11 +1,12 @@
 import {Request, Response, Router} from "express";
 import {authService} from "../domain/auth-service";
-import {jwsService} from "../application/jws-service";
 import {usersService} from "../domain/user-service";
 import {getAuthRouterMiddleware,
         postAuthRouterMiddleware,
         postRegistrationMiddleware,
         postResendingRegistrationEmailMiddleware} from "../middlewares/authRouter-middleware";
+import {refreshTokenValidation} from "../middlewares/validation-middleware/refreshToken-validation";
+import {createToken} from "../helperFunctions";
 
 export const authRouter = Router({})
 
@@ -13,12 +14,11 @@ authRouter.post('/login',
     postAuthRouterMiddleware,
     async (req: Request, res: Response) => {
 
-        const accessToken = await jwsService.createJWT(req.user!, 10) // поменять потом на 10
-        const refreshToken = await jwsService.createJWT(req.user!, 20) // поменять потом на 20
-        console.log('---', refreshToken)
+        const token = await createToken(req.user!)
+
         return res.status(200)
-            .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
-            .send({accessToken: accessToken})
+            .cookie('refreshToken', token.refreshToken, {secure: true, httpOnly: true})
+            .send({accessToken: token.accessToken})
     }
 )
 
@@ -59,58 +59,21 @@ authRouter.post('/registration-email-resending',
     }
 )
 
-authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+authRouter.post('/refresh-token',
+    refreshTokenValidation,
+    async (req: Request, res: Response) => {
 
-        const tokenInBlackList = await jwsService.giveToken(req.cookies.refreshToken)
-        console.log('tokenInBlackList', tokenInBlackList, req.cookies)
-        if (tokenInBlackList) {
-            return res.sendStatus(401)
-        }
-
-        const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
-        console.log('----->', userInfo, req.cookies)
-        if (!userInfo) {
-            return res.sendStatus(401)
-        }
-
-        const user = await usersService.giveUserById(userInfo.userId)
-
-        if (!user) {
-            return res.sendStatus(401)
-        }
-
-        await jwsService.removeRefreshToken(req.cookies.refreshToken)
-
-        const accessToken = await jwsService.createJWT(user, 10) // поменять потом на 10
-        const refreshToken = await jwsService.createJWT(user, 20) // поменять потом на 20
+        const token = await createToken(req.user!)
 
         return res.status(200)
-            .cookie('refreshToken', refreshToken, {secure: true, httpOnly: true})
-            .send({accessToken: accessToken})
+            .cookie('refreshToken', token.refreshToken, {secure: true, httpOnly: true})
+            .send({accessToken: token.accessToken})
     }
 )
 
-authRouter.post('/logout', async (req: Request, res: Response) => {
-
-        const tokenInBlackList = await jwsService.giveToken(req.cookies.refreshToken)
-        console.log('tokenInBlackList', tokenInBlackList, req.cookies)
-        if (tokenInBlackList) {
-            return res.sendStatus(401)
-        }
-
-        const userInfo = await jwsService.getUserIdByToken(req.cookies.refreshToken)
-
-        if (!userInfo) {
-            return res.sendStatus(401)
-        }
-
-        const user = await usersService.giveUserById(userInfo.userId)
-
-        if (!user) {
-            return res.sendStatus(401)
-        }
-
-        await jwsService.removeRefreshToken(req.cookies.refreshToken)
+authRouter.post('/logout',
+    refreshTokenValidation,
+    async (req: Request, res: Response) => {
 
         return res.sendStatus(204)
     }
@@ -124,3 +87,4 @@ authRouter.get('/me',
         return res.status(200).send(aboutMe)
     }
 )
+

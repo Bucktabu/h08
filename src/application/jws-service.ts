@@ -8,7 +8,7 @@ export const jwsService = {
         return jwt.sign({userId: user.id}, settings.JWT_SECRET, {expiresIn: `${timeToExpired}s`})
     },
 
-    async getUserIdByToken(token: string) {
+    async giveUserIdByToken(token: string) {
         try {
             const result: any = await jwt.verify(token, settings.JWT_SECRET)
             return result
@@ -17,11 +17,11 @@ export const jwsService = {
         }
     },
 
-    async removeRefreshToken(refreshToken: string) {
+    async addTokenInBlackList(refreshToken: string) {
         return await jwtBlackList.removeRefreshToken(refreshToken)
     },
 
-    async giveToken(refreshToken: string) {
+    async checkTokenInBlackList(refreshToken: string) {
         return await jwtBlackList.giveToken(refreshToken)
     }
 }
