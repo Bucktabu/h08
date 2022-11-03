@@ -52,8 +52,8 @@ authRouter.post('/registration-email-resending',
         const result = await authService.resendConfirmRegistration(req.body.email)
 
         if (!result) {
-            res.send({ errorsMessages: [{ message: 'Wrong email', field: "email" }] })
-            return res.status(400)
+
+            return res.send({ errorsMessages: [{ message: 'Wrong email', field: "email" }] }).status(400)
         }
 
         return res.sendStatus(204)
