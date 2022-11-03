@@ -52,7 +52,7 @@ export const authService = {
             return false
         }
 
-        return true
+        return await emailConfirmationRepository.updateConfirmationInfo(emailConfirmation.id)
     },
 
     async resendConfirmRegistration(email: string) {
@@ -63,7 +63,7 @@ export const authService = {
         }
 
         const newConfirmationCode = uuidv4()
-        await emailConfirmationRepository.updateConfirmation(newConfirmationCode)
+        await emailConfirmationRepository.updateConfirmationCode(user.id, newConfirmationCode)
 
         const emailConfirmation = await this.giveEmailConfirmationByCodeOrId(user.id)
 

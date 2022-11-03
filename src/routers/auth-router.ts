@@ -28,7 +28,7 @@ authRouter.post('/registration',
 
         const result = await authService.createUser(req.body.login, req.body.password, req.body.email)
         console.log('-----> result: ', result)
-        return res.status(204).send(result)
+        return res.sendStatus(204)
     }
 )
 
@@ -41,7 +41,7 @@ authRouter.post('/registration-confirmation',
             return res.status(400).send({errorsMessages: [{ message: 'Bad Request', field: "code" }]})
         }
 
-        return res.status(204).send(emailConfirmed)
+        return res.sendStatus(204)
     }
 )
 
@@ -55,7 +55,7 @@ authRouter.post('/registration-email-resending',
             return res.sendStatus(400)
         }
 
-        return res.status(204).send(result)
+        return res.sendStatus(204)
     }
 )
 

@@ -16,9 +16,16 @@ export const emailConfirmationRepository = {
             .findOne({$or: [{confirmationCode: codeOrId}, {id: codeOrId}]})
     },
 
-    async updateConfirmation(code: string) {
+    async updateConfirmationCode(id: string, confirmationCode: string) {
         let result = await emailConfirmCollection
-            .updateOne({confirmationCode: code}, {$set: {isConfirmed: true}})
+            .updateOne({id}, {$set: {confirmationCode}})
+
+        return result.modifiedCount === 1
+    },
+
+    async updateConfirmationInfo(id: string) {
+        let result = await emailConfirmCollection
+            .updateOne({id}, {$set: {isConfirmed: true}})
 
         return result.modifiedCount === 1
     },
