@@ -17,7 +17,7 @@ export const authentication = async (req: Request, res: Response, next: NextFunc
         return res.sendStatus(401)
     }
 
-    const user: any = await usersService.giveUserById(userInfo.userId) // ругается, если я в jwt сервисе вывожу без объявления переменной
+    const user: any = await usersService.giveUserById(userInfo.userId)
 
     if (!user) {
         return res.sendStatus(401)

@@ -9,6 +9,7 @@ import {UserDBType} from "../types/user-type";
 import {UserAccountType} from "../types/user-account-type";
 import {EmailConfirmationType} from "../types/email-confirmation-type";
 import {TokenType} from "../types/token-type";
+import {DeviceSecurityType} from "../types/deviceSecurity-type";
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://0.0.0.0:27017/?maxPoolSize=20&w=majority';
 
@@ -17,6 +18,7 @@ const db = client.db('blogsAndPostsDb')
 
 export const blogsCollection = db.collection<BlogType>('blogs')
 export const commentsCollection = db.collection<CommentBDType>('comments')
+export const deviceSecurityCollection = db.collection<DeviceSecurityType>('deviceSecurity')
 export const emailConfirmCollection = db.collection<EmailConfirmationType>('emailConfirm')
 export const postsCollection = db.collection<PostType>('posts')
 export const tokenBlackList = db.collection<TokenType>('tokenBlackList')
